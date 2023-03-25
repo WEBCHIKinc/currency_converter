@@ -1,23 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
+import { ExchangeRateService } from "./API/ExchangeRateService";
+import "./App.css";
+import CurrencyBox from "./components/CurrencyBox";
+import Header from "./components/Header";
 
 function App() {
+  const [currencyList, setCurrencyList] = useState([]);
+  const [usdValue, setUsdValue] = useState(0);
+  const [eurValue, setEurValue] = useState(0);
+
+  useEffect(() => {
+    ExchangeRateService.getCurrencyData("UAH").then((response) => {
+      setCurrencyList(Object.keys(response.data.conversion_rates));
+      setUsdValue((1 / response.data.conversion_rates["USD"]).toFixed(2));
+      setEurValue((1 / response.data.conversion_rates["EUR"]).toFixed(2));
+    });
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Header usdValue={usdValue} eurValue={eurValue} />
+      <CurrencyBox currencyList={currencyList} />
     </div>
   );
 }
